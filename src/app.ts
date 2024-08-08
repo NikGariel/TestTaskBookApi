@@ -12,15 +12,7 @@ const app: Application = express();
 
 // Функция для проверки наличия всех необходимых переменных окружения
 function checkEnvVariables() {
-  const requiredEnvVariables = [
-    'DATABASE_URL',
-    'JWT_SECRET',
-    'EMAIL_TYPE',
-    'EMAIL_HOST',
-    'EMAIL_PORT',
-    'PORT',
-    'FRONTEND_URL',
-  ];
+  const requiredEnvVariables = ['DATABASE_URL', 'JWT_SECRET', 'EMAIL_TYPE', 'PORT', 'FRONTEND_URL'];
 
   for (const variable of requiredEnvVariables) {
     if (!process.env[variable]) {
