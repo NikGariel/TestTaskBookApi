@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: nik
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: nik
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: 'postgres://nik:yourpassword@db:5432/nik'
+      JWT_SECRET: 'uGbnwcVrPRTo4XTMCOpyg2jiRgtC87xC'
+      EMAIL_TYPE: 'gmail'
+      EMAIL_HOST: ''
+      EMAIL_PORT:
+      EMAIL_USERNAME: '@gmail.com'
+      EMAIL_PASSWORD: ''
+      EMAIL_SECURE: yes
+      PORT: 3000
+      FRONTEND_URL: 'localhost:3000'
+    ports:
+      - '3000:3000'
+    command: sh -c "npx prisma migrate deploy && npm run prod"
+
+volumes:
+  db_data:
