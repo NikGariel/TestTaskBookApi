@@ -1,0 +1,314 @@
+openapi: 3.0.0
+info:
+  title: Book Collection API
+  description: RESTful API для управления коллекцией книг с расширенными функциями
+  version: 1.0.0
+servers:
+  - url: "http://localhost:3000"
+    description: Local server
+components:
+  schemas:
+    Book:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: The Catcher in the Rye
+        author:
+          type: string
+          example: J.D. Salinger
+        publicationDate:
+          type: string
+          format: date
+          example: "1951-07-16"
+        genres:
+          type: array
+          items:
+            type: string
+          example:
+            - Fiction
+            - Classic
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          example: john@example.com
+        role:
+          type: integer
+          example: 1
+          description: Битовая маска роли пользователя
+    JWT:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /books:
+    post:
+      summary: Добавление книги
+      security:
+        - bearerAuth: []
+      tags:
+        - Books
+      requestBody:
+        description: Информация о книге
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Книга добавлена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "401":
+          description: Unauthorized
+    get:
+      summary: Получение списка книг
+      tags:
+        - Books
+      responses:
+        "200":
+          description: Список всех книг
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Book"
+  "/books/{id}":
+    get:
+      summary: Получение книги по ID
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Данные книги
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "404":
+          description: Книга не найдена
+    put:
+      summary: Обновление информации о книге
+      security:
+        - bearerAuth: []
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Обновленные данные книги
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Book"
+      responses:
+        "200":
+          description: Информация о книге обновлена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Book"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Книга не найдена
+    delete:
+      summary: Удаление книги
+      security:
+        - bearerAuth: []
+      tags:
+        - Books
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Книга удалена
+        "401":
+          description: Unauthorized
+        "404":
+          description: Книга не найдена
+  /users/register:
+    post:
+      summary: Регистрация пользователя
+      tags:
+        - Users
+      requestBody:
+        description: Информация о пользователе
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+      responses:
+        "200":
+          description: Пользователь зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+  /users/login:
+    post:
+      summary: Аутентификация пользователя
+      tags:
+        - Users
+      requestBody:
+        description: Данные для входа
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Токен JWT
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JWT"
+        "401":
+          description: Unauthorized
+  /users/me:
+    get:
+      summary: Получение информации о текущем пользователе
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Данные текущего пользователя
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+  "/users/{id}/role":
+    put:
+      summary: Изменение роли пользователя
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Новая роль пользователя
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: integer
+                  description: Битовая маска новой роли
+      responses:
+        "200":
+          description: Роль пользователя обновлена
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Пользователь не найден
+  "/users/firstAdmin":
+    post:
+      summary: Назначение роли администратора
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      description:
+        Назначение первой роли администратора. Требует валидного JWT-токена.
+        Запрос должен быть пустым.
+      responses:
+        "200":
+          description: Роль администратора назначена
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+  "/users/verify-email":
+    post:
+      summary: Подтверждение email
+      tags:
+        - Users
+      requestBody:
+        description: Токен для подтверждения email
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  description: Токен подтверждения email
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        "200":
+          description: Email подтвержден
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        "400":
+          description: Неверный или истекший токен
