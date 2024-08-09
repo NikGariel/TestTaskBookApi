@@ -3,7 +3,7 @@
 Команда запуска
 
 ```shell
-docker-compose.yml -p books-api up -d
+docker-compose up -d
 ```
 
 Env vars
