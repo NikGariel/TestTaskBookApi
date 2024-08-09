@@ -39,7 +39,7 @@ services:
       EMAIL_HOST: ""
       EMAIL_PORT:
       EMAIL_USERNAME: "gamenik000@gmail.com"
-      EMAIL_PASSWORD: "ffvl uwge bbuj yjxv"
+      EMAIL_PASSWORD: ""
       EMAIL_SECURE: yes
       PORT: 3000
       FRONTEND_URL: "localhost:3000"
